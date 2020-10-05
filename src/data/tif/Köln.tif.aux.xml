@@ -1,0 +1,27 @@
+<PAMDataset>
+  <PAMRasterBand band="1">
+    <Histograms>
+      <HistItem>
+        <HistMin>-0.375</HistMin>
+        <HistMax>3.375</HistMax>
+        <BucketCount>4</BucketCount>
+        <IncludeOutOfRange>0</IncludeOutOfRange>
+        <Approximate>0</Approximate>
+        <HistCounts>6705|6754|6917|505</HistCounts>
+      </HistItem>
+    </Histograms>
+    <Metadata>
+      <MDI key="COLOR_TABLE_RULES_COUNT">5</MDI>
+      <MDI key="COLOR_TABLE_RULE_RGB_0">1.000000e+00 1.400000e+00 255 255 0 0 255 0</MDI>
+      <MDI key="COLOR_TABLE_RULE_RGB_1">1.400000e+00 1.800000e+00 0 255 0 0 255 255</MDI>
+      <MDI key="COLOR_TABLE_RULE_RGB_2">1.800000e+00 2.200000e+00 0 255 255 0 0 255</MDI>
+      <MDI key="COLOR_TABLE_RULE_RGB_3">2.200000e+00 2.600000e+00 0 0 255 255 0 255</MDI>
+      <MDI key="COLOR_TABLE_RULE_RGB_4">2.600000e+00 3.000000e+00 255 0 255 255 0 0</MDI>
+      <MDI key="Generated_with">GRASS GIS 7.0.4</MDI>
+      <MDI key="STATISTICS_MAXIMUM">3</MDI>
+      <MDI key="STATISTICS_MEAN">1.0585221014319</MDI>
+      <MDI key="STATISTICS_MINIMUM">0</MDI>
+      <MDI key="STATISTICS_STDDEV">0.86352603790696</MDI>
+    </Metadata>
+  </PAMRasterBand>
+</PAMDataset>
