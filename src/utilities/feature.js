@@ -1,18 +1,25 @@
 import Feature from 'ol/Feature';
 import GeoJSON from 'ol/format/GeoJSON';
 import VectorLayer from 'ol/layer/Vector';
-import Bonn from "../data/Bonn.json";
+import VectorSource from 'ol/source/Vector';
+import OlFormatGeoJSON from "ol/format/GeoJSON";
 
 export class Features {
-        static loadGeoJSON (name) {
-            const path = "../data/" + name + ".json";
-            debugger
+        static createVectorLayer () {
+            return new VectorLayer({
+                source: new VectorSource()
+            })
+        };
+        static loadGeoJSON (name, source) {
+            const path = "data/" + name + ".geojson";
             fetch(path)
                 .then(function (response) {
-                    console.log(response);
-                    debugger
                     response.json().then(data => {
-                        console.log(data)
+                        const geojsonFt = new OlFormatGeoJSON().readFeatures(data, {
+                            dataProjection: 'EPSG:4326',
+                            featureProjection: 'EPSG:3857'
+                        });
+                        source.addFeatures(geojsonFt);
                       });     
                     })
                 .catch(error => {
