@@ -1,18 +1,48 @@
-import Feature from 'ol/Feature';
-import GeoJSON from 'ol/format/GeoJSON';
 import VectorLayer from 'ol/layer/Vector';
-import Bonn from "../data/Bonn.json";
+import VectorSource from 'ol/source/Vector';
+import OlFormatGeoJSON from "ol/format/GeoJSON";
 
 export class Features {
-        static loadGeoJSON (name) {
-            const path = "../data/" + name + ".json";
-            debugger
+        static loadGPKG (source) {
+            // eslint-disable-next-line no-undef
+            window.GeoPackage.GeoPackageAPI.open("data/geodata/cities.GPKG")
+                .then(gpkg => {
+                    const featureTables = gpkg.getFeatureTables();
+                    const geojsonFeatures = [];
+                    const features = [];
+
+                    for (let row = 1; row < 56; row++) {
+                        geojsonFeatures.push(gpkg.getFeature(featureTables[0], row));
+                    }
+
+                    geojsonFeatures.forEach(ft => {
+                        features.push(new OlFormatGeoJSON().readFeature(ft, {
+                                dataProjection: 'EPSG:4326',
+                                featureProjection: 'EPSG:3035'
+                            })
+                        )
+                    });
+                    source.addFeatures(features);
+                })
+                .catch(error => {
+                    debugger
+                })
+        }
+        static createVectorLayer () {
+            return new VectorLayer({
+                source: new VectorSource()
+            })
+        };
+        static loadGeoJSON (name, source) {
+            const path = "data/geodata/" + name + ".geojson";
             fetch(path)
                 .then(function (response) {
-                    console.log(response);
-                    debugger
                     response.json().then(data => {
-                        console.log(data)
+                        const geojsonFt = new OlFormatGeoJSON().readFeatures(data, {
+                            dataProjection: 'EPSG:4326',
+                            featureProjection: 'EPSG:3035'
+                        });
+                        source.addFeatures(geojsonFt);
                       });     
                     })
                 .catch(error => {
