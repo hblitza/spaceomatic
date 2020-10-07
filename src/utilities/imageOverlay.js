@@ -4,30 +4,31 @@ import OlProjection from "ol/proj/Projection";
 import Static from 'ol/source/ImageStatic'
 
 export class ImageOverlay {
-    static createImageOverlay (name, extent) {
+    static createImageOverlay (name, extent, map) {
+        const imgPath = "data/" + name + ".png";
 
-        var extent1 = [0, 0, 1024, 968];
-        var projection = new OlProjection({
-            code: 'xkcd-image',
-            units: 'pixels',
-            extent: extent1
-        });
-        
-        const source = new Static({
-            url: "data/" + name + ".png",
-            extent: extent1,
-            projection: projection
-        });
+        fetch(imgPath, { method: 'HEAD' })
+            .then(res => {
+                if (res.ok) {
+                    const source = new Static({
+                        url: "data/" + name + ".png",
+                        imageExtent: extent
+                    });
+            
+                    const layer = new ImageLayer({
+                        source: source
+                    });
+            
+                    map.addLayer(layer);
+                } else {
+                    console.log('Image does not exist.');
+                    return;
+                }
+            })
+            .catch((error) => {
+                debugger
+            })
 
-        source.on('error', evt => {
-            debugger
-            console.log('abc');
-            console.log(evt.getState());
-        });
-
-        debugger
-        
-        // debugger
     };
     static imageLoadFunction = function(image, src) {
         debugger

@@ -1,4 +1,4 @@
-import React, { Component, useState } from 'react';
+import React, { Component } from 'react';
 
 import {
   SimpleButton,
@@ -23,13 +23,12 @@ import GeometryUtil from "@terrestris/ol-util/dist/GeometryUtil/GeometryUtil";
 
 import { ImageOverlay } from "./utilities/imageOverlay";
 
+
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       windowIsHidden: true,
-      infoText: "Bonn: 330.000 inh.",
-      cities: ["Bonn", "Cologne", "Kiel", "Elba"],
       intersection: false,
       intersectedFeatures: undefined
     }
@@ -59,11 +58,11 @@ class App extends Component {
     const vectorLayer = Features.createVectorLayer();
     
     map.addLayer(vectorLayer);
+
+    // load features from geoPackage
+    Features.loadGPKG(vectorLayer.getSource());
     
-    this.state.cities.forEach((ft) => {
-      Features.loadGeoJSON(ft, vectorLayer.getSource());
-    });
-    
+    // create and apply translate interaction
     const translateInteraction = new OlInteractionTranslate();
     map.addInteraction(translateInteraction);
 
@@ -72,13 +71,13 @@ class App extends Component {
       const source = map.getLayers().getArray()[1].getSource();
       const extent = map.getView().calculateExtent(map.getSize());
       source.forEachFeatureInExtent(extent, (ft) => {
-        // debugger
         if (ft.get("name") !== ftTranslate.get("name")) {
           try {
-            const intersect = GeometryUtil.intersection(ft.getGeometry(), ftTranslate.getGeometry());
-            if (intersect) {
+            // const intersect = GeometryUtil.intersection(ft.getGeometry(), ftTranslate.getGeometry());
+            const intersectExtent = ftTranslate.getGeometry().intersectsExtent(ft.getGeometry().getExtent());
+            if (intersectExtent) {
               console.log(ft.get("name"));
-              this.onIntersect(ftTranslate.get("name"), ft.get("name"));
+              this.onIntersect(ftTranslate, ft);
             }
           }
           catch (error) {
@@ -100,46 +99,29 @@ class App extends Component {
       const ftName = evt.feature.get("name"),
         extent = evt.feature.getGeometry().getExtent();
 
-        ImageOverlay.createImageOverlay(ftName, extent);
-
-        // debugger
-
-        // img.getSource().on("imageloadstart", function (evt) {
-        //   debugger
-        // });
-      
+        ImageOverlay.createImageOverlay(ftName, extent, map);
     });
 
-    // map.on('click', (evt) => 
-      
+    map.on('click', (evt) => {
+      debugger
+    });
 
-    //   debugger
-      
-    //   // this.setState({
-    //   //   isInfoWindowHidden: !this.state.isInfoWindowHidden
-    //   // });
-    // });
-
-  };
-
+  }
   render() {
     return (
       <div className="App">
         <MapProvider map={map}>
           <Map />
-
       {this.state.intersection &&
           <InfoWindow
           infoText={this.state.infoText}
+          intersectedFeatures={this.state.intersectedFeatures}
           onCloseWindow={this.onCloseWindow.bind(this)}
           />}
-  
-
         </MapProvider>
       </div>
     );
   };
-
 };
 
 export default App;
