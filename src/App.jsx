@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import {
   SimpleButton,
   MapProvider,
+  Titlebar
 
 } from '@terrestris/react-geo';
 
@@ -23,6 +24,10 @@ import GeometryUtil from "@terrestris/ol-util/dist/GeometryUtil/GeometryUtil";
 
 import { ImageOverlay } from "./utilities/imageOverlay";
 
+import { Game } from "./utilities/game";
+
+import ImageLayer from 'ol/layer/Image';
+
 
 class App extends Component {
   constructor(props) {
@@ -30,14 +35,40 @@ class App extends Component {
     this.state = {
       windowIsHidden: true,
       intersection: false,
-      intersectedFeatures: undefined
+      intersectedFeatures: undefined,
+      gameMode: false,
+      switchModeBtnIconName: "fas fa-wpexplorer fa-3x",
+      modeTitle: "Explorer mode",
+      originalFeatures: []
     }
   };
 
-  saysomething () {
-    this.setState({
-      isInfoWindowHidden: false
-    });
+  switchMode () {
+    if (!this.state.gameMode) {
+      this.setState({
+        gameMode: true,
+        switchModeBtnIconName: "fas fa-gamepad fa-3x",
+        modeTitle: "Game mode"
+      });
+      Game.shuffleFeatures(this.vectorLayer.getSource().getFeatures());
+    }
+    else {
+      this.setState({
+        gameMode: false,
+        switchModeBtnIconName: "fas fa-wpexplorer fa-3x",
+        modeTitle: "Explorer mode"
+      });
+      this.vectorLayerSource.clear();
+      this.map.getLayerGroup().getLayersArray().forEach( function (layer) {
+        if (layer instanceof ImageLayer) {
+          this.map.removeLayer(layer);
+        }
+      }.bind(this))
+      // debugger
+      this.state.originalFeatures.forEach(function (ft) {
+        this.vectorLayerSource.addFeature(ft.clone());
+      }.bind(this));
+    }
   };
 
   onCloseWindow () {
@@ -55,6 +86,7 @@ class App extends Component {
   };
 
   componentDidMount () {
+    this.map = map;
     const vectorLayer = Features.createVectorLayer();
     
     map.addLayer(vectorLayer);
@@ -95,22 +127,60 @@ class App extends Component {
       });
     })
 
-    vectorLayer.getSource().on("addfeature", function (evt) {
+    this.vectorLayer = vectorLayer;
+    this.vectorLayerSource = vectorLayer.getSource();
+
+    this.vectorLayerSource.on("addfeature", function (evt) {
       const ftName = evt.feature.get("name"),
-        extent = evt.feature.getGeometry().getExtent();
+        extent = evt.feature.getGeometry().getExtent(),
+        ftClone = evt.feature.clone(),
+          originalFeatures = this.state.originalFeatures;
+
+          if (originalFeatures.some(e => e.get("name") === ftName)) {
+            return;
+          }
+
+        originalFeatures.push(ftClone);
+    
+        this.setState({
+          originalFeatures: originalFeatures
+        });
 
         ImageOverlay.createImageOverlay(ftName, extent, map);
-    });
+    }.bind(this));
+
+  // debugger
 
     map.on('click', (evt) => {
-      debugger
+      // debugger
     });
 
+    
   }
   render() {
+        if (this.state.gameMode) {
+          // console.log(this.vectorLayer);
+          // debugger
+          
+        }
     return (
       <div className="App">
         <MapProvider map={map}>
+        <Titlebar
+          className="titlebar"
+          tools={[
+            <SimpleButton
+            className={"btn-toggleMode"}
+            onClick={this.switchMode.bind(this)}
+            iconName={this.state.switchModeBtnIconName}
+            tooltip="Switch mode"
+            size="small"
+          >
+          </SimpleButton>
+          ]}
+        >
+{this.state.modeTitle}
+        </Titlebar>
           <Map />
       {this.state.intersection &&
           <InfoWindow

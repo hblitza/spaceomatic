@@ -5,6 +5,7 @@ import OlSourceOsm from 'ol/source/OSM';
 import OlLayerGroup from 'ol/layer/Group';
 import proj4 from 'proj4';
 import {register} from 'ol/proj/proj4';
+import {defaults} from 'ol/control';
 
 
 import {
@@ -39,5 +40,8 @@ export const map = new OlMap({
     projection: "EPSG:3035",
     extent: [2500000, 1500000, 6000000, 5500000]
   }),
-  layers: [layerGroup]
+  layers: [layerGroup],
+  controls: new defaults({
+    zoom: false
+  })
 });
