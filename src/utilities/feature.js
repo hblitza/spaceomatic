@@ -30,7 +30,8 @@ export class Features {
         }
         static createVectorLayer () {
             return new VectorLayer({
-                source: new VectorSource()
+                source: new VectorSource(),
+                name: "featureLayer"
             })
         };
         static loadGeoJSON (name, source) {

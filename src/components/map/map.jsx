@@ -1,11 +1,15 @@
 import OlMap from 'ol/Map';
 import OlView from 'ol/View';
 import OlLayerTile from 'ol/layer/Tile';
+import ImageWMS from 'ol/source/ImageWMS';
 import OlSourceOsm from 'ol/source/OSM';
 import OlLayerGroup from 'ol/layer/Group';
 import proj4 from 'proj4';
 import {register} from 'ol/proj/proj4';
 import {defaults} from 'ol/control';
+import {Image as ImageLayer, Tile as TileLayer} from 'ol/layer';
+
+import XYZ from 'ol/source/XYZ';
 
 
 import {
@@ -21,17 +25,22 @@ register(proj4);
 
 export const Map = mappify(onDropAware(MapComponent));
 
-const layerGroup = new OlLayerGroup({
-  name: 'Layergroup',
-  layers: [
-    new OlLayerTile({
-      source: new OlSourceOsm(),
-      name: 'OSM'
-    })
-  ]
-});
-
-const center = [ 788453.4890155146, 6573085.729161344 ];
+const cartoLight = new TileLayer({
+    source: new XYZ ({
+      url:
+        'https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png'
+    }),
+    name: "cartoLight",
+    visible: true
+  }),
+  cartoLightNoLabels = new TileLayer({
+    source: new XYZ ({
+      url:
+        'https://a.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}@2x.png'
+    }),
+    name: "cartoLightNoLabels",
+    visible: false
+  });
 
 export const map = new OlMap({
   view: new OlView({
@@ -40,7 +49,7 @@ export const map = new OlMap({
     projection: "EPSG:3035",
     extent: [2500000, 1500000, 6000000, 5500000]
   }),
-  layers: [layerGroup],
+  layers: [cartoLight, cartoLightNoLabels],
   controls: new defaults({
     zoom: false
   })

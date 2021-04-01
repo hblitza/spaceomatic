@@ -21,6 +21,7 @@ import 'antd/dist/antd.css';
 import './assets/react-geo.css';
 
 import GeometryUtil from "@terrestris/ol-util/dist/GeometryUtil/GeometryUtil";
+import MapUtil from "@terrestris/ol-util/dist/MapUtil/MapUtil";
 
 import { ImageOverlay } from "./utilities/imageOverlay";
 
@@ -50,6 +51,10 @@ class App extends Component {
         switchModeBtnIconName: "fas fa-gamepad fa-3x",
         modeTitle: "Game mode"
       });
+      const owsGray = new MapUtil.getLayerByName(this.map, "cartoLight");
+      owsGray.setVisible(false);
+      const srtmLayer = new MapUtil.getLayerByName(this.map, "cartoLightNoLabels");
+      srtmLayer.setVisible(true)
       Game.shuffleFeatures(this.vectorLayer.getSource().getFeatures());
     }
     else {
@@ -100,7 +105,8 @@ class App extends Component {
 
     translateInteraction.on("translateend", (evt) => {
       const ftTranslate = evt.features.getArray()[0];
-      const source = map.getLayers().getArray()[1].getSource();
+      const featureLayer = new MapUtil.getLayerByName(this.map, "featureLayer");
+      const source = featureLayer.getSource();
       const extent = map.getView().calculateExtent(map.getSize());
       source.forEachFeatureInExtent(extent, (ft) => {
         if (ft.get("name") !== ftTranslate.get("name")) {
@@ -174,7 +180,7 @@ class App extends Component {
             onClick={this.switchMode.bind(this)}
             iconName={this.state.switchModeBtnIconName}
             tooltip="Switch mode"
-            size="small"
+            size="large"
           >
           </SimpleButton>
           ]}

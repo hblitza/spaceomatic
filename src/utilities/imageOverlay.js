@@ -1,6 +1,4 @@
 import ImageLayer from 'ol/layer/Image';
-import OlProjection from "ol/proj/Projection";
-
 import Static from 'ol/source/ImageStatic'
 
 export class ImageOverlay {
@@ -21,7 +19,6 @@ export class ImageOverlay {
             
                     map.addLayer(layer);
                 } else {
-                    console.log('Image does not exist.');
                     return;
                 }
             })
@@ -30,16 +27,6 @@ export class ImageOverlay {
             })
 
     };
-    static imageLoadFunction = function(image, src) {
-        debugger
-        // Where you start showing the loader using a variable
-        console.time('loader');
-        image.getImage().addEventListener('load', function() {
-          // Where you should mention to stop the loader
-          console.timeEnd('loader');
-        });
-        image.getImage().src = src;
-      };
 }
 
 
